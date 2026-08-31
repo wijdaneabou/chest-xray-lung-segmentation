@@ -117,40 +117,33 @@ Toutes les architectures atteignent l'objectif métier (Dice ≥ 0.90), les éca
 ## Structure du repo
  
 ```
-chest-xray-lung-segmentation/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── notebooks/
-│   ├── phase1_from_scratch/
-│   │   ├── 01_unet.ipynb
-│   │   ├── 02_unetpp.ipynb
-│   │   ├── 03_attention_unet.ipynb
-│   │   ├── 04_deeplabv3plus.ipynb
-│   │   ├── 05_segnet.ipynb
-│   │   └── 06_swin_unet.ipynb
-│   ├── phase2_pretrained_encoders/
-│   │   ├── 07_unet_resnet34_effnetb4.ipynb
-│   │   ├── 08_unetpp_resnet34_effnetb4.ipynb
-│   │   ├── 09_deeplabv3plus_resnet34_effnetb4.ipynb
-│   │   └── 10_lr_grid_search.ipynb
-│   └── 11_model_comparison.ipynb
-├── results/
-│   ├── deployment_config_*.json
-│   └── comparison_table.md
-└── docs/
-    └── report.pdf            # rapport de stage (PFA)
+lung-segmentation-app/
+├── app/
+│   ├── app.py              # Logique principale de l'application
+│   ├── config.py           # Paramètres (chemins, taille image, normalisation)
+│   ├── model.py            # Définition/chargement de l'architecture
+│   ├── model_utils.py      # Fonctions utilitaires (inférence, overlay du masque)
+│   └── preprocessing.py    # Pipeline de prétraitement (identique à l'entraînement)
+├── checkpoints/            # Poids du modèle entraîné (.pth)
+├── streamlit_app.py        # Point d'entrée Streamlit
+└── requirements.txt
 ```
  
-## Installation & Usage
+## Installation
  
 ```bash
-git clone https://github.com/<votre-user>/chest-xray-lung-segmentation.git
-cd chest-xray-lung-segmentation
+git clone https://github.com/<ton-user>/lung-segmentation-app.git
+cd lung-segmentation-app
+python -m venv venv
+source venv/bin/activate      # Windows : venv\Scripts\activate
 pip install -r requirements.txt
 ```
  
-Chaque notebook est autonome : il télécharge/attend le dataset au chemin configuré dans sa classe `Config`, exécute l'intégralité du pipeline (préparation des données → entraînement → évaluation), et exporte son `deployment_config.json` dans `results/`. Le notebook `11_model_comparison.ipynb` charge tous les `deployment_config.json` disponibles pour produire le tableau comparatif final.
+## Lancer l'application
+ 
+```bash
+streamlit run streamlit_app.py
+```
  
 Dataset : [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database) (Kaggle).
  
