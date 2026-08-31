@@ -74,4 +74,97 @@ Appliquée **uniquement sur le train split**, jamais sur validation/test. Trois 
 - **Batch size** : 16, `epochs` max = 50.
 - **Précision mixte (AMP)** : `torch.autocast` + `GradScaler` — réduit l'empreinte mémoire des activations d'environ 40-50% et accélère l'entraînement, sans changer les résultats. Décisif pour faire tenir U-Net++ (le plus lourd des modèles from scratch, du fait de ses skip pathways imbriquées qui gardent beaucoup d'activations en mémoire simultanément).
 - **Checkpointing par epoch** : à la fin de **chaque** epoch (succès ou non), l'état complet (poids du modèle, optimiseur, scheduler, `GradScaler`, historique) est sauvegardé sur disque. Au relancement, l'entraînement **reprend automatiquement** à la bonne epoch au lieu de repartir de zéro — essentiel vu les sessions Kaggle à durée limitée/interruptible.
-- **Sauvegarde du meilleur modèle** : séparément du checkpoint de reprise, les poids correspondant au meilleur `val_loss` observé sont sauvegardés à part (équivalent du `ModelCheckpoint(save_best_only=True)` de Keras, réimplémenté manuellement puisque PyTorch n'a pas d'équivalent natif).  
+- **Sauvegarde du meilleur modèle** : séparément du checkpoint de reprise, les poids correspondant au meilleur `val_loss` observé sont sauvegardés à part (équivalent du `ModelCheckpoint(save_best_only=True)` de Keras, réimplémenté manuellement puisque PyTorch n'a pas d'équivalent natif).
+
+  ### 4.5 Évolution du projet — deux phases
+ 
+1. **Phase 1 — sélection d'architecture** : 6 architectures entraînées from scratch (sauf Swin-UNet, pré-entraîné) sur le dataset Montgomery/Shenzhen/Darwin combiné, chacune dans son propre notebook, comparées sur le même split. U-Net++ est ressorti comme la meilleure architecture.
+2. **Phase 2 — modèle final** : U-Net++ (et DeepLabV3+ pour comparaison) réentraînés avec des encoders **pré-entraînés ImageNet** (ResNet34, EfficientNet-B4), sur le dataset **COVID-19 Radiography Database**, plus volumineux et cliniquement plus diversifié — avec un pipeline de préparation des données renforcé (déduplication par hash + NCC, vérifications de labels systématiques, alignement scheduler/checkpoint).
+## 5. Evaluation
+ 
+### 5.1 Résultats — Phase 1 (from scratch, dataset Montgomery/Shenzhen/Darwin)
+ 
+Test Dice (poumon droit / poumon gauche) :
+ 
+| Architecture | Dice droit | Dice gauche |
+|---|---|---|
+| **U-Net++** (meilleur) | **0.9825** | **0.9799** |
+| Attention U-Net | 0.9818 | 0.9789 |
+| U-Net | 0.9817 | 0.9791 |
+| DeepLabV3+ | 0.9814 | 0.9788 |
+| SegNet (le plus faible — pas de skip connections) | 0.9794 | 0.9768 |
+ 
+Toutes les architectures atteignent l'objectif métier (Dice ≥ 0.90), les écarts entre elles restent marginaux.
+ 
+### 5.2 Résultats — Phase 2 (encoders pré-entraînés, dataset COVID-19 Radiography Database)
+ 
+| Modèle | Dice droit | Dice gauche |
+|---|---|---|
+| U-Net + ResNet34 | 0.9863 | 0.9844 |
+| U-Net + EfficientNet-B4 | 0.9855 | 0.9835 |
+| **U-Net++ + ResNet34** (après déduplication, meilleur modèle final) | **0.9887** | **0.9867** |
+ 
+### 5.3 Vérifications de robustesse
+ 
+- **Inspection des pires cas** : visualisation des images de test avec le plus faible Lung Dice, pour confirmer visuellement que les scores agrégés élevés sont crédibles et ne cachent pas un bug de métrique/label.
+- **Seg-Grad-CAM** : adaptation de Grad-CAM à la segmentation (gradient de la somme des logits d'une classe sur toute la carte spatiale), pour vérifier que le modèle se base sur l'anatomie pulmonaire et non sur des artefacts (lettres imprimées L/R, bords de l'image, équipement).
+- **Cartes d'erreur** : visualisation faux positifs / faux négatifs par rapport à la vérité terrain.
+## 6. Deployment
+ 
+- **Fonction d'inférence** (`predict_lung_segmentation`) : prend le chemin d'une radiographie brute, applique le même pipeline déterministe qu'à l'entraînement (percentile → CLAHE → resize → normalisation), et retourne le masque prédit + une visualisation overlay.
+- **Configuration de déploiement** (`deployment_config.json`) exportée pour chaque notebook : chemins des poids, architecture, encoder, métriques de test — utilisée par le notebook de comparaison pour agréger les résultats de tous les modèles.
+- **Format de sortie** : masque 3 classes (0 = fond, 1 = poumon droit, 2 = poumon gauche), rendu en overlay coloré semi-transparent.
+## Structure du repo
+ 
+```
+chest-xray-lung-segmentation/
+├── README.md
+├── requirements.txt
+├── .gitignore
+├── notebooks/
+│   ├── phase1_from_scratch/
+│   │   ├── 01_unet.ipynb
+│   │   ├── 02_unetpp.ipynb
+│   │   ├── 03_attention_unet.ipynb
+│   │   ├── 04_deeplabv3plus.ipynb
+│   │   ├── 05_segnet.ipynb
+│   │   └── 06_swin_unet.ipynb
+│   ├── phase2_pretrained_encoders/
+│   │   ├── 07_unet_resnet34_effnetb4.ipynb
+│   │   ├── 08_unetpp_resnet34_effnetb4.ipynb
+│   │   ├── 09_deeplabv3plus_resnet34_effnetb4.ipynb
+│   │   └── 10_lr_grid_search.ipynb
+│   └── 11_model_comparison.ipynb
+├── results/
+│   ├── deployment_config_*.json
+│   └── comparison_table.md
+└── docs/
+    └── report.pdf            # rapport de stage (PFA)
+```
+ 
+## Installation & Usage
+ 
+```bash
+git clone https://github.com/<votre-user>/chest-xray-lung-segmentation.git
+cd chest-xray-lung-segmentation
+pip install -r requirements.txt
+```
+ 
+Chaque notebook est autonome : il télécharge/attend le dataset au chemin configuré dans sa classe `Config`, exécute l'intégralité du pipeline (préparation des données → entraînement → évaluation), et exporte son `deployment_config.json` dans `results/`. Le notebook `11_model_comparison.ipynb` charge tous les `deployment_config.json` disponibles pour produire le tableau comparatif final.
+ 
+Dataset : [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database) (Kaggle).
+ 
+## Résultats
+ 
+Meilleur modèle : **U-Net++ avec encoder ResNet34 pré-entraîné**, sur données dédupliquées — Dice test 0.9887 (poumon droit) / 0.9867 (poumon gauche), largement au-dessus de l'objectif métier de 0.90.
+ 
+## Limites & pistes d'amélioration
+ 
+- **Fuite au niveau patient non totalement exclue** : le dataset ne fournit pas d'identifiant patient ; seule la fuite au niveau image (doublons/quasi-doublons) est garantie absente.
+- **Pas de pénalité L2** systématique sur les modèles from scratch.
+- **Flip horizontal désactivé** par choix méthodologique (asymétrie thoracique réelle) — pourrait être réévalué avec une augmentation plus légère/probabiliste.
+- Pistes : validation croisée, test sur un dataset externe non vu pendant le développement, quantification/export ONNX pour le déploiement.
+## Auteur
+ 
+Wijdane Abouzaid — Projet de Fin d'Année (PFA), ENSIASD Taroudant, spécialité AI & Data Engineering.
+ 
