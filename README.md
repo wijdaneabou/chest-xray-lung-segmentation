@@ -36,6 +36,8 @@ Avant de commencer, assure-toi d'avoir un compte Kaggle ou un accès à Google C
 ---
 
 
+
+### Méthodologie
 ## 1. Business Understanding
  
 - **Problème** : la segmentation manuelle des poumons sur radiographie est chronophage et sujette à variabilité inter-observateur.
