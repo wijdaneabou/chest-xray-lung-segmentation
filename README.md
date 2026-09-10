@@ -55,6 +55,21 @@ Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [
 
 ## Results
 
+> **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9893 · IoU score = 0,9786 · Pixel accuracy = 0,9953
+
+### Résultats — From scratch (sans encodeur pré-entraîné)
+
+Pour comparaison, les mêmes architectures ont également été entraînées **from scratch**, sans poids pré-entraînés sur ImageNet :
+
+| Rang | Architecture | Dice droit | Dice gauche | Dice moyen |
+|:---:|---|---:|---:|---:|
+| 1 | **U-Net** | **0,9864** | **0,9847** | **0,9856** |
+| 2 | DeepLabV3 | 0,9864 | 0,9842 | 0,9853 |
+| 3 | Attention U-Net | 0,9861 | 0,9837 | 0,9849 |
+| 4 | U-Net++ | 0,9859 | 0,9834 | 0,9847 |
+
+> **Meilleur modèle from scratch : U-Net** — Dice moyen = 0,9856
+
 Comparaison des architectures et encodeurs testés (métriques de test, triées par performance décroissante) :
 
 | Rang | Modèle | Encoder | Dice coef | IoU score | Pixel accuracy |
