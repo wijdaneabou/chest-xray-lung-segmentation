@@ -72,123 +72,25 @@ Avant de commencer, assure-toi d'avoir un compte Kaggle ou un accès à Google C
 
 
 ### Méthodologie
-## 1. Business Understanding
+## Methodology
  
-- **Problème** : la segmentation manuelle des poumons sur radiographie est chronophage et sujette à variabilité inter-observateur.
-- **Objectif** : localiser automatiquement le poumon droit et le poumon gauche séparément, comme étape préalable à l'analyse de pathologies pulmonaires.
-- **Critère de succès** : Dice coefficient ≥ 0.90 par poumon sur le jeu de test.
-- **Approche retenue** : segmentation sémantique supervisée, comparaison de plusieurs architectures de deep learning.
----
-
-## 2. Data Understanding
-- **Volume initial** : 4 classes sources (COVID, Normal, Lung_Opacity, Viral Pneumonia), ~21 165 paires image/masque au total.
-- **Format** : images PNG en niveaux de gris, masques binaires (0 = fond, 255 = poumons fusionnés, sans distinction droite/gauche à l'origine)
----
+- Split stratifié : 70% train, 15% validation et 15% test.
+- Suppression des doublons avant la séparation des données.
+- Prétraitement : percentile normalization, CLAHE, redimensionnement à 256×256 et normalisation Z-score.
+- Les statistiques de normalisation sont calculées uniquement sur le train set.
+- Augmentation appliquée uniquement aux données d'entraînement (flip horizontal désactivé).
+- Modèles comparés : U-Net, DeepLabV3+, Attention U-Net et U-Net++.
+- Encodeurs pré-entraînés testés : ResNet34 et EfficientNet-B4.
+- Fonction de perte : combinaison Dice Loss et Cross-Entropy.
+- Optimisation des hyperparamètres avec Optuna TPE.
+- Entraînement avec Adam, AMP, early stopping et sauvegarde du meilleur checkpoint.
+- Métriques : Dice, IoU et pixel accuracy.
+Le modèle est sélectionné sur la validation. Le jeu de test est conservé pour l'évaluation finale.
  
-## 3. Data Preparation
-
-### 3.4 Split Train / Validation / Test
- 
-- **Répartition** : 70 % train / 15 % validation / 15 % test.
-- **Stratification** : sur les 4 classes diagnostiques sources (COVID, Normal, Lung_Opacity, Viral Pneumonia), pour garantir une répartition proportionnelle dans les 3 ensembles.
-- **Reproductibilité** : `random_state=42` fixe, split fait en cascade (`train_test_split` appliqué deux fois, car `sklearn` ne coupe qu'en 2 à la fois).
-- **Pourquoi c'est critique ici** : les 6 architectures sont entraînées séparément (notebooks distincts) — elles doivent toutes voir **exactement** le même split pour que la comparaison finale soit valide.
-
-Deux stratégies selon que le modèle est entraîné from scratch ou avec un encoder pré-entraîné :
- 
-| Cas | Normalisation | Canaux |
-|---|---|---|
-| Modèles from scratch (U-Net, U-Net++, Attention U-Net, DeepLabV3+, SegNet) | Z-score `(x/255 − mean) / std`, stats calculées **sur le train uniquement** | 1 (grayscale) |
-| Swin-UNet (encoder pré-entraîné ImageNet) | Normalisation ImageNet standard (mean/std officiels) | 3 (grayscale dupliqué) |
- 
-**Point de rigueur méthodologique** : les statistiques de normalisation (mean/std) sont calculées **uniquement sur le train set**, jamais sur val/test — calculer sur l'ensemble du dataset avant le split introduirait une fuite de données (*data leakage*), le modèle aurait alors indirectement connaissance de statistiques sur les données qu'il est censé n'avoir jamais vues.
-
-### 3.6 Data Augmentation
- 
-Appliquée **uniquement sur le train split**, jamais sur validation/test. Trois catégories :
- 
-- **Géométrique** (image + masque, même transformation) : flip horizontal, rotation (±8-10°), translation, scale (±10-20%) — masque toujours interpolé en plus-proche-voisin, `borderValue=0` (classe fond) pour les zones créées par la transformation.
-- **Photométrique** (image uniquement) : variation de luminosité/contraste, correction gamma.
-- **Bruit** (image uniquement) : bruit gaussien, flou de mouvement (simulant un mouvement du patient pendant l'acquisition).
-**Bug corrigé en cours de projet** : le flip horizontal doit **échanger les labels 1 et 2** après la transformation. Comme droit/gauche sont définis par la position x du centroïde dans l'image, ce qui était à gauche de l'image se retrouve à droite après un flip — sans cet échange, le modèle apprenait une association erronée entre position spatiale et label de classe.
- 
----
+Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [`docs/methodology.md`](docs/methodology.md).
 
 
 
-## 4. Modeling
-
-### 4.2 Fonction de perte et métriques
- 
-- **Loss combinée** : `dice_weight × DiceLoss + (1 − dice_weight) × CrossEntropy`, avec `dice_weight = 0.5`.
-  - La CrossEntropy apporte un gradient stable en début d'entraînement (quand les prédictions sont quasi aléatoires, le Dice seul donne des gradients peu informatifs).
-  - Le Dice gère le déséquilibre de classes (le fond représente ~75-80% des pixels, les poumons le reste) — une CrossEntropy seule biaiserait l'apprentissage vers le fond.
-- **Métriques de suivi** : Dice coefficient (par classe + moyenne), IoU (Intersection over Union), pixel accuracy — toutes calculées par classe pour vérifier spécifiquement le critère métier (Dice ≥ 0.90 par poumon, pas juste en moyenne globale).
-
-
-### 4.3 Régularisation
- 
-| Technique | Rôle |
-|---|---|
-| **BatchNorm** (dans chaque bloc convolutif) | Stabilise l'entraînement, effet régularisant implicite |
-| **Data augmentation** | Principal rempart contre le surapprentissage, particulièrement important pour les modèles from scratch (pas de pré-entraînement pour "amortir" l'initialisation aléatoire) |
-| **Dropout(0.3)** | Utilisé dans le module ASPP de DeepLabV3+ |
-| **Early Stopping** (`patience=25`) | Arrête l'entraînement si `val_loss` ne s'améliore plus pendant 25 epochs consécutives — évite de continuer à surapprendre après le point optimal |
-| **ReduceLROnPlateau** (`factor=0.5`, `patience=4`, `cooldown=2`, `min_lr=1e-6`) | Réduit le learning rate par paliers quand `val_loss` plafonne — permet une convergence plus fine en fin d'entraînement |
- 
-*Remarque* : aucune pénalité L2 explicite (`weight_decay`) n'a été ajoutée à l'optimiseur Adam — piste d'amélioration possible si un surapprentissage était constaté.
-
-
-
-### 4.4 Optimisation et entraînement
- 
-- **Optimiseur** : Adam, `learning_rate = 1e-4`.
-- **Batch size** : 16, `epochs` max = 50.
-- **Précision mixte (AMP)** : `torch.autocast` + `GradScaler` — réduit l'empreinte mémoire des activations d'environ 40-50% et accélère l'entraînement, sans changer les résultats. Décisif pour faire tenir U-Net++ (le plus lourd des modèles from scratch, du fait de ses skip pathways imbriquées qui gardent beaucoup d'activations en mémoire simultanément).
-- **Checkpointing par epoch** : à la fin de **chaque** epoch (succès ou non), l'état complet (poids du modèle, optimiseur, scheduler, `GradScaler`, historique) est sauvegardé sur disque. Au relancement, l'entraînement **reprend automatiquement** à la bonne epoch au lieu de repartir de zéro — essentiel vu les sessions Kaggle à durée limitée/interruptible.
-- **Sauvegarde du meilleur modèle** : séparément du checkpoint de reprise, les poids correspondant au meilleur `val_loss` observé sont sauvegardés à part (équivalent du `ModelCheckpoint(save_best_only=True)` de Keras, réimplémenté manuellement puisque PyTorch n'a pas d'équivalent natif).
-
-  ### 4.5 Évolution du projet — deux phases
- 
-1. **Phase 1 — sélection d'architecture** : 6 architectures entraînées from scratch (sauf Swin-UNet, pré-entraîné) sur le dataset Montgomery/Shenzhen/Darwin combiné, chacune dans son propre notebook, comparées sur le même split. U-Net++ est ressorti comme la meilleure architecture.
-2. **Phase 2 — modèle final** : U-Net++ (et DeepLabV3+ pour comparaison) réentraînés avec des encoders **pré-entraînés ImageNet** (ResNet34, EfficientNet-B4), sur le dataset **COVID-19 Radiography Database**, plus volumineux et cliniquement plus diversifié — avec un pipeline de préparation des données renforcé (déduplication par hash + NCC, vérifications de labels systématiques, alignement scheduler/checkpoint).
-## 5. Evaluation
- 
-### 5.1 Résultats — Phase 1 (from scratch, dataset Montgomery/Shenzhen/Darwin)
- 
-Test Dice (poumon droit / poumon gauche) :
- 
-| Architecture | Dice droit | Dice gauche |
-|---|---|---|
-| **U-Net++** (meilleur) | **0.9825** | **0.9799** |
-| Attention U-Net | 0.9818 | 0.9789 |
-| U-Net | 0.9817 | 0.9791 |
-| DeepLabV3+ | 0.9814 | 0.9788 |
-| SegNet (le plus faible — pas de skip connections) | 0.9794 | 0.9768 |
- 
-Toutes les architectures atteignent l'objectif métier (Dice ≥ 0.90), les écarts entre elles restent marginaux.
- 
-### 5.2 Résultats — Phase 2 (encoders pré-entraînés, dataset COVID-19 Radiography Database)
- 
-| Modèle | Dice droit | Dice gauche |
-|---|---|---|
-| U-Net + ResNet34 | 0.9863 | 0.9844 |
-| U-Net + EfficientNet-B4 | 0.9855 | 0.9835 |
-| **U-Net++ + ResNet34** (après déduplication, meilleur modèle final) | **0.9887** | **0.9867** |
- 
-### 5.3 Vérifications de robustesse
- 
-- **Inspection des pires cas** : visualisation des images de test avec le plus faible Lung Dice, pour confirmer visuellement que les scores agrégés élevés sont crédibles et ne cachent pas un bug de métrique/label.
-- **Seg-Grad-CAM** : adaptation de Grad-CAM à la segmentation (gradient de la somme des logits d'une classe sur toute la carte spatiale), pour vérifier que le modèle se base sur l'anatomie pulmonaire et non sur des artefacts (lettres imprimées L/R, bords de l'image, équipement).
-- **Cartes d'erreur** : visualisation faux positifs / faux négatifs par rapport à la vérité terrain.
-
- 
-Dataset : [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database) (Kaggle).
- 
-## Résultats
- 
-Meilleur modèle : **U-Net++ avec encoder ResNet34 pré-entraîné**, sur données dédupliquées — Dice test 0.9887 (poumon droit) / 0.9867 (poumon gauche), largement au-dessus de l'objectif métier de 0.90.
- 
 ## Limites & pistes d'amélioration
  
 - **Fuite au niveau patient non totalement exclue** : le dataset ne fournit pas d'identifiant patient ; seule la fuite au niveau image (doublons/quasi-doublons) est garantie absente.
