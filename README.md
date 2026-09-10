@@ -77,17 +77,6 @@ Comparaison des architectures et encodeurs testés (Test Dice, argmax) :
 
 **Meilleur modèle global : U-Net++ (ResNet34)**
 
-Les hyperparamètres sélectionnés par Optuna pour ce modèle sont :
-
-```text
-Learning rate : 5.94e-05
-Weight decay  : 1.06e-07
-Batch size    : 4
-Dice weight   : 0.7
-```
-
-L'objectif d'Optuna était de maximiser le **Validation Soft Lung Dice**. Les métriques finales du test sont calculées sur les masques discrets obtenus avec `argmax`.
- 
 ## Explainability
  
 Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
