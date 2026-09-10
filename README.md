@@ -40,9 +40,6 @@ Avant de commencer, assure-toi d'avoir un compte Kaggle ou un accès à Google C
 * **Étape 4 :** Exécute toutes les cellules.
 ---
 
-
-
-### Méthodologie
 ## Methodology
  
 - Split stratifié : 70% train, 15% validation et 15% test.
