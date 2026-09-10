@@ -55,7 +55,7 @@ Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [
 
 ## Results
 
-Comparaison des architectures et encodeurs testés (métriques de validation, triées par performance décroissante) :
+Comparaison des architectures et encodeurs testés (métriques de test, triées par performance décroissante) :
 
 | Rang | Modèle | Encoder | Dice coef | IoU score | Pixel accuracy |
 |:---:|---|---|---:|---:|---:|
@@ -63,13 +63,12 @@ Comparaison des architectures et encodeurs testés (métriques de validation, tr
 | 2 | Attention U-Net | resnet34 | 0,9884 | 0,9774 | 0,9950 |
 | 3 | U-Net++ | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
 | 4 | Attention U-Net | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
-| 5 | U-Net | efficientnet-b4 | 0,9867 | 0,9737 | — |
-| 6 | U-Net | resnet34 | 0,9866 | 0,9736 | — |
+| 5 | U-Net | resnet34 | 0,9881 | 0,9766 | — |
+| 6 | U-Net | efficientnet-b4 | 0,9879 | 0,9761 | — |
 | 7 | DeepLabV3+ | resnet34 | 0,9857 | 0,9719 | — |
 | 8 | DeepLabV3+ | efficientnet-b4 | 0,9846 | 0,9698 | — |
 
 > **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9890 · IoU score = 0,9786 · Pixel accuracy = 0,9953
-## Explainability
  
 Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
  
