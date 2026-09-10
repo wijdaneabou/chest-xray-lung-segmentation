@@ -19,12 +19,6 @@ Pour ce projet, nous utilisons le [COVID-19 Radiography Database](https://www.ka
 | Viral Pneumonia | 1345 |
  
 ---
-## 6. Deployment
- 
-- **Fonction d'inférence** (`predict_lung_segmentation`) : prend le chemin d'une radiographie brute, applique le même pipeline déterministe qu'à l'entraînement (percentile → CLAHE → resize → normalisation), et retourne le masque prédit + une visualisation overlay.
-- **Configuration de déploiement** (`deployment_config.json`) exportée pour chaque notebook : chemins des poids, architecture, encoder, métriques de test — utilisée par le notebook de comparaison pour agréger les résultats de tous les modèles.
-- **Format de sortie** : masque 3 classes (0 = fond, 1 = poumon droit, 2 = poumon gauche), rendu en overlay coloré semi-transparent.
-
 ## Comment exécuter le notebook
  
 ### Prérequis
