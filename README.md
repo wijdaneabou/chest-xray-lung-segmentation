@@ -56,29 +56,39 @@ Avant de commencer, assure-toi d'avoir un compte Kaggle ou un accès à Google C
 - Optimisation des hyperparamètres avec Optuna TPE.
 - Entraînement avec Adam, AMP, early stopping et sauvegarde du meilleur checkpoint.
 - Métriques : Dice, IoU et pixel accuracy.
+
+  ![Pipeline de la méthodologie](docs/images/pipeline.png)
 Le modèle est sélectionné sur la validation. Le jeu de test est conservé pour l'évaluation finale.
  
 Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [`docs/methodology.md`](docs/methodology.md).
 
+
 ## Results
- 
-Le meilleur modèle obtenu est **U-Net++ avec encodeur ResNet34 pré-entraîné**.
- 
-| Métrique | Poumon droit | Poumon gauche |
-|---|---:|---:|
-| Test Dice (Hard, argmax) | **0,9887** | **0,9867** |
- 
-Les deux scores dépassent le critère de succès fixé à 0,90.
- 
-Les hyperparamètres sélectionnés par Optuna sont :
- 
+
+Comparaison des architectures et encodeurs testés (Test Dice, argmax) :
+
+| Modèle | Encodeur | Dice Poumon droit | Dice Poumon gauche |
+|---|---|---:|---:|
+| **U-Net++** | **ResNet34** | **0,9897** | **0,9882** |
+| Attention U-Net | ResNet34 | 0,9895 | 0,9872 |
+| U-Net++ | EfficientNet-B4 | 0,9892 | 0,9874 |
+| Attention U-Net | EfficientNet-B4 | 0,9891 | 0,9875 |
+| U-Net | EfficientNet-B4 | 0,9875 | 0,9858 |
+| U-Net | ResNet34 | 0,9873 | 0,9859 |
+| DeepLabV3+ | ResNet34 | 0,9867 | 0,9848 |
+| DeepLabV3+ | EfficientNet-B4 | 0,9858 | 0,9835 |
+
+**Meilleur modèle global : U-Net++ (ResNet34)**
+
+Les hyperparamètres sélectionnés par Optuna pour ce modèle sont :
+
 ```text
 Learning rate : 5.94e-05
 Weight decay  : 1.06e-07
 Batch size    : 4
 Dice weight   : 0.7
 ```
- 
+
 L'objectif d'Optuna était de maximiser le **Validation Soft Lung Dice**. Les métriques finales du test sont calculées sur les masques discrets obtenus avec `argmax`.
  
 ## Explainability
