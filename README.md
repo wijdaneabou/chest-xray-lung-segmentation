@@ -89,7 +89,89 @@ Le modèle est sélectionné sur la validation. Le jeu de test est conservé pou
  
 Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [`docs/methodology.md`](docs/methodology.md).
 
-
+## Results
+ 
+Le meilleur modèle obtenu est **U-Net++ avec encodeur ResNet34 pré-entraîné**.
+ 
+| Métrique | Poumon droit | Poumon gauche |
+|---|---:|---:|
+| Test Dice (Hard, argmax) | **0,9887** | **0,9867** |
+ 
+Les deux scores dépassent le critère de succès fixé à 0,90.
+ 
+Les hyperparamètres sélectionnés par Optuna sont :
+ 
+```text
+Learning rate : 5.94e-05
+Weight decay  : 1.06e-07
+Batch size    : 4
+Dice weight   : 0.7
+```
+ 
+L'objectif d'Optuna était de maximiser le **Validation Soft Lung Dice**. Les métriques finales du test sont calculées sur les masques discrets obtenus avec `argmax`.
+ 
+## Explainability
+ 
+Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
+ 
+- les lettres d'orientation ;
+- les bords de l'image ;
+- les éléments externes ;
+- les dispositifs médicaux.
+Des cartes d'erreur et les cas présentant les plus faibles scores Dice sont également analysés.
+ 
+## Deployment
+ 
+Une application Streamlit permet de :
+ 
+1. charger une radiographie thoracique ;
+2. appliquer le même prétraitement que pendant l'entraînement ;
+3. générer le masque pulmonaire ;
+4. afficher une superposition colorée du poumon droit et du poumon gauche.
+## Project Structure
+ 
+```text
+lung-segmentation-app/
+├── app/
+│   ├── app.py
+│   ├── config.py
+│   ├── model.py
+│   ├── model_utils.py
+│   └── preprocessing.py
+├── checkpoints/
+├── notebooks/
+├── docs/
+│   └── methodology.md
+├── streamlit_app.py
+├── requirements.txt
+└── README.md
+```
+ 
+## Installation
+ 
+```bash
+git clone https://github.com/<your-username>/lung-segmentation-app.git
+cd lung-segmentation-app
+ 
+python -m venv venv
+source venv/bin/activate        # Linux/macOS
+venv\Scripts\activate           # Windows
+ 
+pip install -r requirements.txt
+```
+ 
+## Run the Application
+ 
+```bash
+streamlit run streamlit_app.py
+```
+ 
+## Limitations
+ 
+- Les identifiants patients ne sont pas disponibles ; une fuite au niveau patient ne peut donc pas être totalement exclue.
+- Certains masques de référence peuvent contenir des imprécisions ou des erreurs d'annotation.
+- Les performances n'ont pas encore été vérifiées sur un dataset externe.
+- Le modèle est destiné à la recherche et au prétraitement d'images, et non à une utilisation clinique autonome.
 
 ## Limites & pistes d'amélioration
  
