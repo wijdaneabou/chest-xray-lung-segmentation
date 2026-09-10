@@ -57,7 +57,7 @@ Avant de commencer, assure-toi d'avoir un compte Kaggle ou un accès à Google C
 - Entraînement avec Adam, AMP, early stopping et sauvegarde du meilleur checkpoint.
 - Métriques : Dice, IoU et pixel accuracy.
 
-  ![Pipeline de la méthodologie](docs/images/pipeline.png)
+  ![Pipeline de la méthodologie](docs/images/pipline.png)
 Le modèle est sélectionné sur la validation. Le jeu de test est conservé pour l'évaluation finale.
  
 Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [`docs/methodology.md`](docs/methodology.md).
