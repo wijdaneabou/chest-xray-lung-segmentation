@@ -24,36 +24,7 @@ Pour ce projet, nous utilisons le [COVID-19 Radiography Database](https://www.ka
 - **Fonction d'inférence** (`predict_lung_segmentation`) : prend le chemin d'une radiographie brute, applique le même pipeline déterministe qu'à l'entraînement (percentile → CLAHE → resize → normalisation), et retourne le masque prédit + une visualisation overlay.
 - **Configuration de déploiement** (`deployment_config.json`) exportée pour chaque notebook : chemins des poids, architecture, encoder, métriques de test — utilisée par le notebook de comparaison pour agréger les résultats de tous les modèles.
 - **Format de sortie** : masque 3 classes (0 = fond, 1 = poumon droit, 2 = poumon gauche), rendu en overlay coloré semi-transparent.
-## Structure du repo
- 
-```
-lung-segmentation-app/
-├── app/
-│   ├── app.py              # Logique principale de l'application
-│   ├── config.py           # Paramètres (chemins, taille image, normalisation)
-│   ├── model.py            # Définition/chargement de l'architecture
-│   ├── model_utils.py      # Fonctions utilitaires (inférence, overlay du masque)
-│   └── preprocessing.py    # Pipeline de prétraitement (identique à l'entraînement)
-├── checkpoints/            # Poids du modèle entraîné (.pth)
-├── streamlit_app.py        # Point d'entrée Streamlit
-└── requirements.txt
-```
- 
-## Installation
- 
-```bash
-git clone https://github.com/<ton-user>/lung-segmentation-app.git
-cd lung-segmentation-app
-python -m venv venv
-source venv/bin/activate      
-pip install -r requirements.txt
-```
- 
-## Lancer l'application
- 
-```bash
-streamlit run streamlit_app.py
-```
+
 ## Comment exécuter le notebook
  
 ### Prérequis
