@@ -59,7 +59,7 @@ Comparaison des architectures et encodeurs testés (métriques de test, triées 
 
 | Rang | Modèle | Encoder | Dice coef | IoU score | Pixel accuracy |
 |:---:|---|---|---:|---:|---:|
-| 1 | **U-Net++** | resnet34 | **0,9890** | **0,9786** | **0,9953** |
+| 1 | **U-Net++** | resnet34 | **0,9893** | **0,9786** | **0,9953** |
 | 2 | DeepLabV3+ | resnet34 | 0,9885 | — | — |
 | 3 | Attention U-Net | resnet34 | 0,9884 | 0,9774 | 0,9950 |
 | 4 | U-Net++ | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
@@ -68,7 +68,7 @@ Comparaison des architectures et encodeurs testés (métriques de test, triées 
 | 7 | U-Net | efficientnet-b4 | 0,9879 | 0,9761 | — |
 | 8 | DeepLabV3+ | efficientnet-b4 | 0,9846 | 0,9698 | — |
 
-> **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9890 · IoU score = 0,9786 · Pixel accuracy = 0,9953
+> **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9893 · IoU score = 0,9786 · Pixel accuracy = 0,9953
  
 Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
  
