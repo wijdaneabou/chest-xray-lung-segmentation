@@ -45,7 +45,7 @@ lung-segmentation-app/
 git clone https://github.com/<ton-user>/lung-segmentation-app.git
 cd lung-segmentation-app
 python -m venv venv
-source venv/bin/activate      # Windows : venv\Scripts\activate
+source venv/bin/activate      
 pip install -r requirements.txt
 ```
  
