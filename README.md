@@ -84,15 +84,18 @@ Comparaison des architectures et encodeurs testés (métriques de test, triées 
 | 8 | DeepLabV3+ | efficientnet-b4 | 0,9846 | 0,9698 | — |
 
 > **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9893 · IoU score = 0,9786 · Pixel accuracy = 0,9953
- 
-Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
+
+## Explainability
+
+- **Inspection des pires cas** : visualisation des images de test avec le plus faible Lung Dice, pour confirmer visuellement que les scores agrégés élevés sont crédibles et ne cachent pas un bug de métrique/label.
+- **Cartes d'erreur** : visualisation faux positifs / faux négatifs par rapport à la vérité terrain.
+- **Seg-Grad-CAM** : Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
  
 - les lettres d'orientation ;
 - les bords de l'image ;
 - les éléments externes ;
 - les dispositifs médicaux.
-Des cartes d'erreur et les cas présentant les plus faibles scores Dice sont également analysés.
- 
+
 ## Deployment
  
 Une application Streamlit permet de :
