@@ -1,111 +1,112 @@
 # chest-xray-lung-segmentation
 
 ## About
- 
-Un diagnostic fiable des pathologies pulmonaires à partir de radiographies thoraciques (CXR) nécessite d'isoler précisément la zone d'intérêt, souvent parasitée par des éléments hors-poumon (côtes, artefacts, lettres d'orientation). Ce projet propose une **segmentation pulmonaire automatique bilatérale** (poumon droit / poumon gauche distingués), comme étape préalable à toute analyse de pathologie pulmonaire.
- 
-Plusieurs architectures de segmentation sémantique ont été comparées pour retenir la plus performante — validée par **Seg-Grad-CAM** pour confirmer qu'elle s'appuie sur l'anatomie pulmonaire réelle.
- 
+
+A reliable diagnosis of lung pathologies from chest X-rays (CXR) requires precisely isolating the region of interest, which is often cluttered by non-lung elements (ribs, artifacts, orientation letters). This project proposes an **automatic bilateral lung segmentation** (right lung / left lung distinguished), as a preliminary step before any lung pathology analysis.
+
+Several semantic segmentation architectures were compared to select the best-performing one — validated with **Seg-Grad-CAM** to confirm that it relies on actual lung anatomy.
+
 ---
 ## Dataset
- 
-Pour ce projet, nous utilisons le [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database). Cette base de données complète contient des images de radiographies thoraciques réparties en quatre classes distinctes : COVID-19, normal, opacité pulmonaire (Lung_Opacity), et pneumonie virale. Plus précisément, le dataset comprend 3616 images de cas positifs au COVID-19, 10 192 images classées comme normales, 6012 images d'opacité pulmonaire, et 1345 images identifiées comme pneumonie virale. Cette collection étendue permet d'entraîner nos modèles de diagnostic efficacement, garantissant une performance robuste dans l'identification et la classification de ces pathologies.
- 
-| Classe | Nombre d'images |
+
+For this project, we use the [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database). This comprehensive database contains chest X-ray images divided into four distinct classes: COVID-19, normal, lung opacity (Lung_Opacity), and viral pneumonia. Specifically, the dataset includes 3,616 images of COVID-19-positive cases, 10,192 images classified as normal, 6,012 images of lung opacity, and 1,345 images identified as viral pneumonia. This extensive collection allows our diagnostic models to be trained effectively, ensuring robust performance in identifying and classifying these pathologies.
+
+| Class | Number of images |
 |---|---|
 | COVID | 3616 |
 | Normal | 10192 |
 | Lung_Opacity | 6012 |
 | Viral Pneumonia | 1345 |
- 
+
 ---
-## Comment exécuter le notebook
- 
-### Prérequis
-Avant de commencer, assure-toi d'avoir un compte Kaggle ou un accès à Google Colab, ainsi que Python 3 installé si tu exécutes le notebook en local.
- 
-* **Étape 1 : Télécharger le dataset**
-   * Télécharge le [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database).
-   * Le dataset doit inclure les images et les masques pour COVID-19, Lung Opacity, Normal et Viral Pneumonia.
-* **Étape 2 : Configurer ton environnement**
-   * Kaggle : importe le dataset dans ton compte Kaggle et utilise-le dans un nouveau notebook.
-   * Google Colab : importe le dataset sur Google Drive, monte le drive dans Colab, et met à jour les chemins en conséquence.
-* **Étape 3 :** Mets à jour les chemins vers le dataset dans le notebook selon ta configuration d'environnement.
-* **Étape 4 :** Exécute toutes les cellules.
+## How to run the notebook
+
+### Prerequisites
+Before you start, make sure you have a Kaggle account or access to Google Colab, as well as Python 3 installed if you run the notebook locally.
+
+* **Step 1: Download the dataset**
+   * Download the [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database).
+   * The dataset must include the images and masks for COVID-19, Lung Opacity, Normal, and Viral Pneumonia.
+* **Step 2: Set up your environment**
+   * Kaggle: import the dataset into your Kaggle account and use it in a new notebook.
+   * Google Colab: upload the dataset to Google Drive, mount the drive in Colab, and update the paths accordingly.
+* **Step 3:** Update the dataset paths in the notebook according to your environment setup.
+* **Step 4:** Run all cells.
 ---
 
 ## Methodology
- 
-- Split stratifié : 70% train, 15% validation et 15% test.
-- Suppression des doublons avant la séparation des données.
-- Prétraitement : percentile normalization, CLAHE, redimensionnement à 256×256 et normalisation Z-score.
-- Les statistiques de normalisation sont calculées uniquement sur le train set.
-- Augmentation appliquée uniquement aux données d'entraînement (flip horizontal désactivé).
-- Modèles comparés : U-Net, DeepLabV3+, Attention U-Net et U-Net++.
-- Encodeurs pré-entraînés testés : ResNet34 et EfficientNet-B4.
-- Fonction de perte : combinaison Dice Loss et Cross-Entropy.
-- Optimisation des hyperparamètres avec Optuna TPE.
-- Entraînement avec Adam, AMP, early stopping et sauvegarde du meilleur checkpoint.
-- Métriques : Dice, IoU et pixel accuracy.
 
-  ![Pipeline de la méthodologie](docs/images/pipline.png)
-Le modèle est sélectionné sur la validation. Le jeu de test est conservé pour l'évaluation finale.
- 
-Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [`docs/methodology.md`](docs/methodology.md).
+- Stratified split: 70% train, 15% validation, and 15% test.
+- Duplicate removal before splitting the data.
+- Preprocessing: percentile normalization, CLAHE, resizing to 256×256, and Z-score normalization.
+- Normalization statistics are computed only on the training set.
+- Augmentation applied only to the training data (horizontal flip disabled).
+- Models compared: U-Net, DeepLabV3+, Attention U-Net, and U-Net++.
+- Pretrained encoders tested: ResNet34 and EfficientNet-B4.
+- Loss function: combination of Dice Loss and Cross-Entropy.
+- Hyperparameter optimization with Optuna TPE.
+- Training with Adam, AMP, early stopping, and best-checkpoint saving.
+- Metrics: Dice, IoU, and pixel accuracy.
+
+  ![Methodology pipeline](docs/images/pipline.png)
+The model is selected based on validation performance. The test set is reserved for final evaluation.
+
+Full details (functions, per-epoch checkpointing, regularization): see [`docs/methodology.md`](docs/methodology.md).
 
 ## Results
 
-> **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9893 · IoU score = 0,9786 · Pixel accuracy = 0,9953
+> **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9786 · Pixel accuracy = 0.9953
 
-### Résultats — From scratch (sans encodeur pré-entraîné)
+### Results — From scratch (without pretrained encoder)
 
-Pour comparaison, les mêmes architectures ont également été entraînées **from scratch**, sans poids pré-entraînés sur ImageNet :
+For comparison, the same architectures were also trained **from scratch**, without ImageNet pretrained weights:
 
-| Rang | Architecture | Dice droit | Dice gauche | Dice moyen |
+| Rank | Architecture | Right Dice | Left Dice | Mean Dice |
 |:---:|---|---:|---:|---:|
-| 1 | **U-Net** | **0,9864** | **0,9847** | **0,9856** |
-| 2 | DeepLabV3 | 0,9864 | 0,9842 | 0,9853 |
-| 3 | Attention U-Net | 0,9861 | 0,9837 | 0,9849 |
-| 4 | U-Net++ | 0,9859 | 0,9834 | 0,9847 |
+| 1 | **U-Net** | **0.9864** | **0.9847** | **0.9856** |
+| 2 | DeepLabV3 | 0.9864 | 0.9842 | 0.9853 |
+| 3 | Attention U-Net | 0.9861 | 0.9837 | 0.9849 |
+| 4 | U-Net++ | 0.9859 | 0.9834 | 0.9847 |
 
-> **Meilleur modèle from scratch : U-Net** — Dice moyen = 0,9856
+> **Best from-scratch model: U-Net** — Mean Dice = 0.9856
 
-Comparaison des architectures et encodeurs testés (métriques de test, triées par performance décroissante) :
+Comparison of the architectures and encoders tested (test metrics, sorted by decreasing performance):
 
-| Rang | Modèle | Encoder | Dice coef | IoU score | Pixel accuracy |
+| Rank | Model | Encoder | Dice coef | IoU score | Pixel accuracy |
 |:---:|---|---|---:|---:|---:|
-| 1 | **U-Net++** | resnet34 | **0,9893** | **0,9786** | **0,9953** |
-| 2 | DeepLabV3+ | resnet34 | 0,9885 | — | — |
-| 3 | Attention U-Net | resnet34 | 0,9884 | 0,9774 | 0,9950 |
-| 4 | U-Net++ | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
-| 5 | Attention U-Net | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
-| 6 | U-Net | resnet34 | 0,9881 | 0,9766 | — |
-| 7 | U-Net | efficientnet-b4 | 0,9879 | 0,9761 | — |
-| 8 | DeepLabV3+ | efficientnet-b4 | 0,9846 | 0,9698 | — |
+| 1 | **U-Net++** | resnet34 | **0.9893** | **0.9786** | **0.9953** |
+| 2 | DeepLabV3+ | resnet34 | 0.9885 | — | — |
+| 3 | Attention U-Net | resnet34 | 0.9884 | 0.9774 | 0.9950 |
+| 4 | U-Net++ | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
+| 5 | Attention U-Net | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
+| 6 | U-Net | resnet34 | 0.9881 | 0.9766 | — |
+| 7 | U-Net | efficientnet-b4 | 0.9879 | 0.9761 | — |
+| 8 | DeepLabV3+ | efficientnet-b4 | 0.9846 | 0.9698 | — |
 
-> **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9893 · IoU score = 0,9786 · Pixel accuracy = 0,9953
+> **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9786 · Pixel accuracy = 0.9953
 
 ## Explainability
 
-- **Inspection des pires cas** : visualisation des images de test avec le plus faible Lung Dice, pour confirmer visuellement que les scores agrégés élevés sont crédibles et ne cachent pas un bug de métrique/label.
-- **Cartes d'erreur** : visualisation faux positifs / faux négatifs par rapport à la vérité terrain.
-- **Seg-Grad-CAM** : Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
- 
-- les lettres d'orientation ;
-- les bords de l'image ;
-- les éléments externes ;
-- les dispositifs médicaux.
+- **Worst-case inspection**: visualization of test images with the lowest Lung Dice, to visually confirm that the high aggregate scores are credible and don't hide a metric/label bug.
+- **Error maps**: visualization of false positives / false negatives relative to ground truth.
+- **Seg-Grad-CAM**: A Seg-Grad-CAM analysis is used to verify that the model focuses primarily on lung regions rather than on artifacts such as:
+
+- orientation letters;
+- image edges;
+- external elements;
+- medical devices.
 
 ## Deployment
- 
-Une application Streamlit permet de :
- 
-1. charger une radiographie thoracique ;
-2. appliquer le même prétraitement que pendant l'entraînement ;
-3. générer le masque pulmonaire ;
-4. afficher une superposition colorée du poumon droit et du poumon gauche.
+
+A Streamlit application allows the user to:
+
+1. upload a chest X-ray;
+2. apply the same preprocessing used during training;
+3. generate the lung mask;
+4. display a colored overlay of the right and left lungs.
+
 ## Project Structure
- 
+
 ```text
 lung-segmentation-app/
 ├── app/
@@ -122,40 +123,40 @@ lung-segmentation-app/
 ├── requirements.txt
 └── README.md
 ```
- 
+
 ## Installation
- 
+
 ```bash
 git clone https://github.com/<your-username>/lung-segmentation-app.git
 cd lung-segmentation-app
- 
+
 python -m venv venv
 source venv/bin/activate        # Linux/macOS
 venv\Scripts\activate           # Windows
- 
+
 pip install -r requirements.txt
 ```
- 
+
 ## Run the Application
- 
+
 ```bash
 streamlit run streamlit_app.py
 ```
- 
-## Limitations
- 
-- Les identifiants patients ne sont pas disponibles ; une fuite au niveau patient ne peut donc pas être totalement exclue.
-- Certains masques de référence peuvent contenir des imprécisions ou des erreurs d'annotation.
-- Les performances n'ont pas encore été vérifiées sur un dataset externe.
-- Le modèle est destiné à la recherche et au prétraitement d'images, et non à une utilisation clinique autonome.
 
-## Limites & pistes d'amélioration
- 
-- **Fuite au niveau patient non totalement exclue** : le dataset ne fournit pas d'identifiant patient ; seule la fuite au niveau image (doublons/quasi-doublons) est garantie absente.
-- **Pas de pénalité L2** systématique sur les modèles from scratch.
-- **Flip horizontal désactivé** par choix méthodologique (asymétrie thoracique réelle) — pourrait être réévalué avec une augmentation plus légère/probabiliste.
-- Pistes : validation croisée, test sur un dataset externe non vu pendant le développement, quantification/export ONNX pour le déploiement.
-## Auteur
- 
-Wijdane Abouzaid — Projet de Fin d'Année (PFA), ENSIASD Taroudant, spécialité AI & Data Engineering.
- 
+## Limitations
+
+- Patient IDs are not available, so patient-level leakage cannot be fully ruled out.
+- Some reference masks may contain inaccuracies or annotation errors.
+- Performance has not yet been verified on an external dataset.
+- The model is intended for research and image preprocessing purposes, not for standalone clinical use.
+
+## Limitations & Future Improvements
+
+- **Patient-level leakage not fully ruled out**: the dataset does not provide a patient identifier; only image-level leakage (duplicates/near-duplicates) is guaranteed to be absent.
+- **No systematic L2 penalty** on the from-scratch models.
+- **Horizontal flip disabled** by methodological choice (real thoracic asymmetry) — could be reevaluated with lighter/probabilistic augmentation.
+- Ideas for future work: cross-validation, testing on an external dataset not seen during development, quantization/ONNX export for deployment.
+
+## Author
+
+Wijdane Abouzaid — Final Year Project (PFA), ENSIASD Taroudant, AI & Data Engineering specialty.
