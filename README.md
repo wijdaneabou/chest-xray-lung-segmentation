@@ -57,18 +57,18 @@ Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [
 
 Comparaison des architectures et encodeurs testés (métriques de validation, triées par performance décroissante) :
 
-| Rang | Modèle | Architecture | Encoder | Dice coef | IoU score | Pixel accuracy |
-|:---:|---|---|---|---:|---:|---:|
-| 1 | **U-Net++ (ResNet34)** | U-Net++ | resnet34 | **0,9890** | **0,9786** | **0,9953** |
-| 2 | Attention U-Net (ResNet34) | Attention U-Net | resnet34 | 0,9884 | 0,9774 | 0,9950 |
-| 3 | U-Net++ (EfficientNet-B4) | U-Net++ | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
-| 4 | Attention U-Net (EfficientNet-B4) | Attention U-Net | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
-| 5 | U-Net (EfficientNet-B4) | U-Net | efficientnet-b4 | 0,9867 | 0,9737 | — |
-| 6 | U-Net (ResNet34) | U-Net | resnet34 | 0,9866 | 0,9736 | — |
-| 7 | DeepLabV3+ (ResNet34) | DeepLabV3+ | resnet34 | 0,9857 | 0,9719 | — |
-| 8 | DeepLabV3+ (EfficientNet-B4) | DeepLabV3+ | efficientnet-b4 | 0,9846 | 0,9698 | — |
+| Rang | Modèle | Encoder | Dice coef | IoU score | Pixel accuracy |
+|:---:|---|---|---:|---:|---:|
+| 1 | **U-Net++** | resnet34 | **0,9890** | **0,9786** | **0,9953** |
+| 2 | Attention U-Net | resnet34 | 0,9884 | 0,9774 | 0,9950 |
+| 3 | U-Net++ | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
+| 4 | Attention U-Net | efficientnet-b4 | 0,9883 | 0,9773 | 0,9950 |
+| 5 | U-Net | efficientnet-b4 | 0,9867 | 0,9737 | — |
+| 6 | U-Net | resnet34 | 0,9866 | 0,9736 | — |
+| 7 | DeepLabV3+ | resnet34 | 0,9857 | 0,9719 | — |
+| 8 | DeepLabV3+ | efficientnet-b4 | 0,9846 | 0,9698 | — |
 
-> **Meilleur modèle : U-Net++ (ResNet34)** — Dice coef = 0,9890 · IoU score = 0,9786 · Pixel accuracy = 0,9953
+> **Meilleur modèle : U-Net++ (resnet34)** — Dice coef = 0,9890 · IoU score = 0,9786 · Pixel accuracy = 0,9953
 ## Explainability
  
 Une analyse Seg-Grad-CAM est utilisée pour vérifier que le modèle porte principalement son attention sur les régions pulmonaires et non sur des artefacts tels que :
