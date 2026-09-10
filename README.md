@@ -62,20 +62,22 @@ Détails complets (fonctions, checkpointing par epoch, régularisation) : voir [
 
 ## Results
 
-Comparaison des architectures et encodeurs testés (Test Dice, argmax) :
+## Results
 
-| Modèle | Encodeur | Dice Poumon droit | Dice Poumon gauche |
-|---|---|---:|---:|
-| **U-Net++** | **ResNet34** | **0,9897** | **0,9882** |
-| Attention U-Net | ResNet34 | 0,9895 | 0,9872 |
-| U-Net++ | EfficientNet-B4 | 0,9892 | 0,9874 |
-| Attention U-Net | EfficientNet-B4 | 0,9891 | 0,9875 |
-| U-Net | EfficientNet-B4 | 0,9875 | 0,9858 |
-| U-Net | ResNet34 | 0,9873 | 0,9859 |
-| DeepLabV3+ | ResNet34 | 0,9867 | 0,9848 |
-| DeepLabV3+ | EfficientNet-B4 | 0,9858 | 0,9835 |
+Comparaison complète des architectures et encodeurs testés (métriques de validation) :
 
-**Meilleur modèle global : U-Net++ (ResNet34)**
+| Modèle | Architecture | Encoder | Dice (Poumon droit) | Dice (Poumon gauche) | Mean Lung Dice | IoU (Poumon droit) | IoU (Poumon gauche) | Mean Lung IoU | Test loss | Test acc |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| **U-Net++ (ResNet34)** | **U-Net++** | **timm-efficientnet-b4** | **0,9897** | **0,9882** | **0,9890** | **0,9801** | **0,9770** | **0,9786** | **0,0115** | **0,9953** |
+| Attention U-Net (ResNet34) | Attention U-Net | resnet34 | 0,9895 | 0,9872 | 0,9884 | 0,9797 | 0,9751 | 0,9774 | 0,0117 | 0,9950 |
+| U-Net++ (EfficientNet-B4) | U-Net++ | timm-efficientnet-b4 | 0,9892 | 0,9874 | 0,9883 | 0,9790 | 0,9755 | 0,9773 | 0,0119 | 0,9950 |
+| Attention U-Net (EfficientNet-B4) | Attention U-Net | timm-efficientnet-b4 | 0,9891 | 0,9875 | 0,9883 | 0,9789 | 0,9756 | 0,9773 | 0,0118 | 0,9950 |
+| U-Net (EfficientNet-B4) | U-Net | timm-efficientnet-b4 | 0,9875 | 0,9858 | 0,9867 | 0,9754 | 0,9720 | 0,9737 | — | — |
+| U-Net (ResNet34) | U-Net | resnet34 | 0,9873 | 0,9859 | 0,9866 | 0,9749 | 0,9722 | 0,9736 | — | — |
+| DeepLabV3+ (ResNet34) | DeepLabV3+ | resnet34 | 0,9867 | 0,9848 | 0,9857 | 0,9739 | 0,9700 | 0,9719 | — | — |
+| DeepLabV3+ (EfficientNet-B4) | DeepLabV3+ | timm-efficientnet-b4 | 0,9858 | 0,9835 | 0,9846 | 0,9720 | 0,9676 | 0,9698 | — | — |
+
+**Meilleur modèle global : U-Net++ (ResNet34)** — Mean Lung Dice = 0,9890 · Mean Lung IoU = 0,9786
 
 ## Explainability
  
