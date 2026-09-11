@@ -85,6 +85,9 @@ Comparison of the architectures and encoders tested (test metrics, sorted by dec
 
 > **Note méthodologique** : Dice coef et IoU score correspondent à la moyenne des scores *hard* (argmax) du poumon droit et du poumon gauche, calculée sur le jeu de test. Pixel accuracy est reportée telle quelle depuis l'évaluation sur le test set.
 > **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9786 · Pixel accuracy = 0.9953
+![Prediction example](docs/images/predection.png)
+
+![Grad-CAM comparison](docs/images/grad.png)
 
 ## Explainability
 
