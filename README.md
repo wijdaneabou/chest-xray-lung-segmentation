@@ -19,21 +19,6 @@ For this project, we use the [COVID-19 Radiography Database](https://www.kaggle.
 | Viral Pneumonia | 1345 |
 
 ---
-## How to run the notebook
-
-### Prerequisites
-Before you start, make sure you have a Kaggle account or access to Google Colab, as well as Python 3 installed if you run the notebook locally.
-
-* **Step 1: Download the dataset**
-   * Download the [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database).
-   * The dataset must include the images and masks for COVID-19, Lung Opacity, Normal, and Viral Pneumonia.
-* **Step 2: Set up your environment**
-   * Kaggle: import the dataset into your Kaggle account and use it in a new notebook.
-   * Google Colab: upload the dataset to Google Drive, mount the drive in Colab, and update the paths accordingly.
-* **Step 3:** Update the dataset paths in the notebook according to your environment setup.
-* **Step 4:** Run all cells.
----
-
 ## Methodology
 
 - Stratified split: 70% train, 15% validation, and 15% test.
@@ -81,10 +66,11 @@ Comparison of the architectures and encoders tested (test metrics, sorted by dec
 | 7 | DeepLabV3+ | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
 | 7 | Attention U-Net | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
 
-> **Note méthodologique** : Dice coef et IoU score correspondent à la moyenne des scores *hard* (argmax) du poumon droit et du poumon gauche, calculée sur le jeu de test. Pixel accuracy est reportée telle quelle depuis l'évaluation sur le test set. Les rangs 7 sont ex æquo (valeurs identiques à la précision affichée).
-
 > **Note méthodologique** : Dice coef et IoU score correspondent à la moyenne des scores *hard* (argmax) du poumon droit et du poumon gauche, calculée sur le jeu de test. Pixel accuracy est reportée telle quelle depuis l'évaluation sur le test set.
-> **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9786 · Pixel accuracy = 0.9953
+> **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9792 · Pixel accuracy = 0.9954
+![Prediction example](docs/images/predection.PNG)
+
+![Grad-CAM comparison](docs/images/grad.PNG)
 
 ## Explainability
 
@@ -105,24 +91,28 @@ A Streamlit application allows the user to:
 2. apply the same preprocessing used during training;
 3. generate the lung mask;
 4. display a colored overlay of the right and left lungs.
-![PulmoVision Streamlit interface](docs/images/app.png)
+![PulmoVision Streamlit interface](docs/images/app.PNG)
 ## Project Structure
+
+# Project Structure
 
 ```text
 lung-segmentation-app/
 ├── app/
-│   ├── app.py
-│   ├── config.py
-│   ├── model.py
-│   ├── model_utils.py
-│   └── preprocessing.py
+│   ├── api_predict.py       # FastAPI app (/health and /predict endpoints)
+│   ├── config.py            # Central configuration (paths, device, post-processing settings)
+│   ├── model.py             # U-Net++ model construction 
+│   ├── model_utils.py       # Inference pipeline (prediction, post-processing, overlay, stats)
+│   └── preprocessing.py     # Image preprocessing (decoding, CLAHE, normalization)
 ├── checkpoints/
-├── notebooks/
+│   ├── deployment_config.json    # Model metadata exported after training
+│   └── unetpp_resnet34_final.pth # Trained U-Net++ (ResNet34) weights
+├── notebooks/                # Training and experimentation notebooks
 ├── docs/
-│   └── methodology.md
-├── streamlit_app.py
-├── requirements.txt
-└── README.md
+│   └── methodology.md        # Methodology documentation (CRISP-DM, dataset choices, etc.)
+├── streamlit_app.py           # Streamlit UI (image upload, API calls, results display)
+├── requirements.txt           # Python dependencies
+└── README.md                  # Project overview and setup instructions
 ```
 
 ## Installation
@@ -143,20 +133,28 @@ pip install -r requirements.txt
 ```bash
 streamlit run streamlit_app.py
 ```
+## How to run the notebook
 
-## Limitations
+### Prerequisites
+Before you start, make sure you have a Kaggle account or access to Google Colab, as well as Python 3 installed if you run the notebook locally.
 
-- Patient IDs are not available, so patient-level leakage cannot be fully ruled out.
-- Some reference masks may contain inaccuracies or annotation errors.
-- Performance has not yet been verified on an external dataset.
-- The model is intended for research and image preprocessing purposes, not for standalone clinical use.
+* **Step 1: Download the dataset**
+   * Download the [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database).
+   * The dataset must include the images and masks for COVID-19, Lung Opacity, Normal, and Viral Pneumonia.
+* **Step 2: Set up your environment**
+   * Kaggle: import the dataset into your Kaggle account and use it in a new notebook.
+   * Google Colab: upload the dataset to Google Drive, mount the drive in Colab, and update the paths accordingly.
+* **Step 3:** Update the dataset paths in the notebook according to your environment setup.
+* **Step 4:** Run all cells.
+---
 
 ## Limitations & Future Improvements
 
 - **Patient-level leakage not fully ruled out**: the dataset does not provide a patient identifier; only image-level leakage (duplicates/near-duplicates) is guaranteed to be absent.
-- **No systematic L2 penalty** on the from-scratch models.
-- **Horizontal flip disabled** by methodological choice (real thoracic asymmetry) — could be reevaluated with lighter/probabilistic augmentation.
-- Ideas for future work: cross-validation, testing on an external dataset not seen during development, quantization/ONNX export for deployment.
+- **No clinical validation yet**: The model has not been clinically validated and has not been evaluated in a real clinical workflow or by medical professionals.
+- The dataset has strong class imbalance.
+- Some labels were manually annotated, while others were automatically extracted.
+- Ideas for future work: Integration into a medical image viewer ,
 
 ## Author
 
