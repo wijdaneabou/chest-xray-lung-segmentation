@@ -105,7 +105,7 @@ A Streamlit application allows the user to:
 2. apply the same preprocessing used during training;
 3. generate the lung mask;
 4. display a colored overlay of the right and left lungs.
-
+![PulmoVision Streamlit interface](docs/images/app.png)
 ## Project Structure
 
 ```text
