@@ -81,10 +81,8 @@ Comparison of the architectures and encoders tested (test metrics, sorted by dec
 | 7 | DeepLabV3+ | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
 | 7 | Attention U-Net | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
 
-> **Note méthodologique** : Dice coef et IoU score correspondent à la moyenne des scores *hard* (argmax) du poumon droit et du poumon gauche, calculée sur le jeu de test. Pixel accuracy est reportée telle quelle depuis l'évaluation sur le test set. Les rangs 7 sont ex æquo (valeurs identiques à la précision affichée).
-
 > **Note méthodologique** : Dice coef et IoU score correspondent à la moyenne des scores *hard* (argmax) du poumon droit et du poumon gauche, calculée sur le jeu de test. Pixel accuracy est reportée telle quelle depuis l'évaluation sur le test set.
-> **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9786 · Pixel accuracy = 0.9953
+> **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9792 · Pixel accuracy = 0.9954
 ![Prediction example](docs/images/predection.PNG)
 
 ![Grad-CAM comparison](docs/images/grad.PNG)
