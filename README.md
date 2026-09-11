@@ -111,6 +111,9 @@ A Streamlit application allows the user to:
 ![PulmoVision Streamlit interface](docs/images/app.PNG)
 ## Project Structure
 
+# Project Structure
+
+```text
 lung-segmentation-app/
 ├── app/
 │   ├── api_predict.py       # FastAPI app (/health and /predict endpoints)
@@ -127,6 +130,7 @@ lung-segmentation-app/
 ├── streamlit_app.py           # Streamlit UI (image upload, API calls, results display)
 ├── requirements.txt           # Python dependencies
 └── README.md                  # Project overview and setup instructions
+```
 
 ## Installation
 
