@@ -19,21 +19,6 @@ For this project, we use the [COVID-19 Radiography Database](https://www.kaggle.
 | Viral Pneumonia | 1345 |
 
 ---
-## How to run the notebook
-
-### Prerequisites
-Before you start, make sure you have a Kaggle account or access to Google Colab, as well as Python 3 installed if you run the notebook locally.
-
-* **Step 1: Download the dataset**
-   * Download the [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database).
-   * The dataset must include the images and masks for COVID-19, Lung Opacity, Normal, and Viral Pneumonia.
-* **Step 2: Set up your environment**
-   * Kaggle: import the dataset into your Kaggle account and use it in a new notebook.
-   * Google Colab: upload the dataset to Google Drive, mount the drive in Colab, and update the paths accordingly.
-* **Step 3:** Update the dataset paths in the notebook according to your environment setup.
-* **Step 4:** Run all cells.
----
-
 ## Methodology
 
 - Stratified split: 70% train, 15% validation, and 15% test.
@@ -148,6 +133,20 @@ pip install -r requirements.txt
 ```bash
 streamlit run streamlit_app.py
 ```
+## How to run the notebook
+
+### Prerequisites
+Before you start, make sure you have a Kaggle account or access to Google Colab, as well as Python 3 installed if you run the notebook locally.
+
+* **Step 1: Download the dataset**
+   * Download the [COVID-19 Radiography Database](https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database).
+   * The dataset must include the images and masks for COVID-19, Lung Opacity, Normal, and Viral Pneumonia.
+* **Step 2: Set up your environment**
+   * Kaggle: import the dataset into your Kaggle account and use it in a new notebook.
+   * Google Colab: upload the dataset to Google Drive, mount the drive in Colab, and update the paths accordingly.
+* **Step 3:** Update the dataset paths in the notebook according to your environment setup.
+* **Step 4:** Run all cells.
+---
 
 ## Limitations & Future Improvements
 
