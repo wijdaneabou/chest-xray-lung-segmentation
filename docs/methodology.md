@@ -1,6 +1,6 @@
 # Detailed Methodology — Chest X-Ray Lung Segmentation, Explained
 
-Let me walk through each stage with the reasoning behind it, using concrete examples where it helps.
+
 
 ## 1. Preprocessing
 
@@ -26,8 +26,6 @@ Applied **only to the training split** — never to validation or test, since th
 - **Geometric**: rotation, translation, scale — simulates natural variation in patient positioning during the X-ray.
 - **Photometric**: brightness/contrast jitter, gamma correction — simulates variation in exposure settings across different X-ray machines.
 - **Noise**: Gaussian noise, motion blur — simulates sensor noise or slight patient movement during acquisition.
-- **Horizontal flip is deliberately disabled**: this is a methodological choice, not an oversight. The chest is not perfectly symmetric — the heart sits to the left, and the lungs' shapes differ slightly left vs. right. Flipping an X-ray horizontally would produce an image that looks anatomically implausible (e.g., a heart silhouette on the wrong side), which could teach the model incorrect anatomical priors rather than genuine invariances.
-
 ## 4. Loss Function and Metrics
 
 **Combined loss**: `dice_weight × DiceLoss + (1 − dice_weight) × CrossEntropy`
