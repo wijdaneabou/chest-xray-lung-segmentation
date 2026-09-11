@@ -55,11 +55,9 @@ Full details (functions, per-epoch checkpointing, regularization): see [`docs/me
 
 ## Results
 
-> **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9786 · Pixel accuracy = 0.9953
-
 ### Results — From scratch (without pretrained encoder)
 
-For comparison, the same architectures were also trained **from scratch**, without ImageNet pretrained weights:
+For comparison, the same architectures qre trained **from scratch**, without ImageNet pretrained weights:
 
 | Rank | Architecture | Right Dice | Left Dice | Mean Dice |
 |:---:|---|---:|---:|---:|
