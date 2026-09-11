@@ -80,6 +80,8 @@ Comparison of the architectures and encoders tested (test metrics, sorted by dec
 - image edges;
 - external elements;
 - medical devices.
+
+  
   ![Grad-CAM comparison](docs/images/grad.PNG)
 
 ## Deployment
