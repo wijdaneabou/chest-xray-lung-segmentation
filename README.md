@@ -70,17 +70,19 @@ For comparison, the same architectures qre trained **from scratch**, without Ima
 
 Comparison of the architectures and encoders tested (test metrics, sorted by decreasing performance):
 
+
 | Rank | Model | Encoder | Dice coef | IoU score | Pixel accuracy |
 |:---:|---|---|---:|---:|---:|
-| 1 | **U-Net++** | resnet34 | **0.9893** | **0.9786** | **0.9953** |
-| 2 | DeepLabV3+ | resnet34 | 0.9885 | — | — |
-| 3 | Attention U-Net | resnet34 | 0.9884 | 0.9774 | 0.9950 |
-| 4 | U-Net++ | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
-| 5 | Attention U-Net | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
-| 6 | U-Net | resnet34 | 0.9881 | 0.9766 | — |
-| 7 | U-Net | efficientnet-b4 | 0.9879 | 0.9761 | — |
-| 8 | DeepLabV3+ | efficientnet-b4 | 0.9846 | 0.9698 | — |
+| 1 | **U-Net++** | resnet34 | **0.9893** | **0.9792** | **0.9954** |
+| 2 | U-Net | resnet34 | 0.9889 | 0.9784 | 0.9953 |
+| 3 | U-Net++ | efficientnet-b4 | 0.9888 | 0.9784 | 0.9953 |
+| 4 | U-Net | efficientnet-b4 | 0.9886 | 0.9779 | 0.9952 |
+| 5 | DeepLabV3+ | resnet34 | 0.9885 | 0.9777 | 0.9951 |
+| 6 | Attention U-Net | resnet34 | 0.9884 | 0.9774 | 0.9950 |
+| 7 | DeepLabV3+ | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
+| 7 | Attention U-Net | efficientnet-b4 | 0.9883 | 0.9773 | 0.9950 |
 
+> **Note méthodologique** : Dice coef et IoU score correspondent à la moyenne des scores *hard* (argmax) du poumon droit et du poumon gauche, calculée sur le jeu de test. Pixel accuracy est reportée telle quelle depuis l'évaluation sur le test set.
 > **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9786 · Pixel accuracy = 0.9953
 
 ## Explainability
