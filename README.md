@@ -111,22 +111,22 @@ A Streamlit application allows the user to:
 ![PulmoVision Streamlit interface](docs/images/app.PNG)
 ## Project Structure
 
-```text
 lung-segmentation-app/
 ├── app/
-│   ├── app.py
-│   ├── config.py
-│   ├── model.py
-│   ├── model_utils.py
-│   └── preprocessing.py
+│   ├── api_predict.py       # FastAPI app (/health and /predict endpoints)
+│   ├── config.py            # Central configuration (paths, device, post-processing settings)
+│   ├── model.py             # U-Net++ model construction 
+│   ├── model_utils.py       # Inference pipeline (prediction, post-processing, overlay, stats)
+│   └── preprocessing.py     # Image preprocessing (decoding, CLAHE, normalization)
 ├── checkpoints/
-├── notebooks/
+│   ├── deployment_config.json    # Model metadata exported after training
+│   └── unetpp_resnet34_final.pth # Trained U-Net++ (ResNet34) weights
+├── notebooks/                # Training and experimentation notebooks
 ├── docs/
-│   └── methodology.md
-├── streamlit_app.py
-├── requirements.txt
-└── README.md
-```
+│   └── methodology.md        # Methodology documentation (CRISP-DM, dataset choices, etc.)
+├── streamlit_app.py           # Streamlit UI (image upload, API calls, results display)
+├── requirements.txt           # Python dependencies
+└── README.md                  # Project overview and setup instructions
 
 ## Installation
 
@@ -147,19 +147,13 @@ pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
-## Limitations
-
-- Patient IDs are not available, so patient-level leakage cannot be fully ruled out.
-- Some reference masks may contain inaccuracies or annotation errors.
-- Performance has not yet been verified on an external dataset.
-- The model is intended for research and image preprocessing purposes, not for standalone clinical use.
-
 ## Limitations & Future Improvements
 
 - **Patient-level leakage not fully ruled out**: the dataset does not provide a patient identifier; only image-level leakage (duplicates/near-duplicates) is guaranteed to be absent.
-- **No systematic L2 penalty** on the from-scratch models.
-- **Horizontal flip disabled** by methodological choice (real thoracic asymmetry) — could be reevaluated with lighter/probabilistic augmentation.
-- Ideas for future work: cross-validation, testing on an external dataset not seen during development, quantization/ONNX export for deployment.
+- **No clinical validation yet**: The model has not been clinically validated and has not been evaluated in a real clinical workflow or by medical professionals.
+- The dataset has strong class imbalance.
+- Some labels were manually annotated, while others were automatically extracted.
+- Ideas for future work: Integration into a medical image viewer ,
 
 ## Author
 
