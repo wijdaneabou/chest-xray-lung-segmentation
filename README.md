@@ -70,8 +70,6 @@ Comparison of the architectures and encoders tested (test metrics, sorted by dec
 > **Best model: U-Net++ (resnet34)** — Dice coef = 0.9893 · IoU score = 0.9792 · Pixel accuracy = 0.9954
 ![Prediction example](docs/images/predection.PNG)
 
-![Grad-CAM comparison](docs/images/grad.PNG)
-
 ## Explainability
 
 - **Worst-case inspection**: visualization of test images with the lowest Lung Dice, to visually confirm that the high aggregate scores are credible and don't hide a metric/label bug.
@@ -82,6 +80,7 @@ Comparison of the architectures and encoders tested (test metrics, sorted by dec
 - image edges;
 - external elements;
 - medical devices.
+  ![Grad-CAM comparison](docs/images/grad.PNG)
 
 ## Deployment
 
