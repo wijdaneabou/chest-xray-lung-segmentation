@@ -48,14 +48,25 @@ def postprocess_prediction(pred_mask, num_classes=None, min_area_ratio=None, fil
     return cleaned
 
 
-def draw_lung_mask(img_gray, mask, right_color=(255, 0, 0), left_color=(0, 255, 0), alpha=0.4):
-    """Superpose les masques poumon droit/gauche sur l'image grayscale (fond semi-transparent)."""
+def draw_lung_mask(
+    img_gray,
+    mask,
+    right_color=(178, 24, 24),
+    left_color=(22, 122, 48),
+    alpha=0.3,
+):
+    """Superpose les masques poumon droit/gauche sur l'image grayscale : remplissage
+    semi-transparent foncé, sans contour."""
     img_rgb = cv2.cvtColor(img_gray, cv2.COLOR_GRAY2RGB).astype(np.float32)
+
+    # Remplissage semi-transparent, plus foncé et plus saturé qu'auparavant.
     overlay = img_rgb.copy()
     overlay[mask == 1] = right_color
     overlay[mask == 2] = left_color
     blended = cv2.addWeighted(overlay, alpha, img_rgb, 1 - alpha, 0)
-    return blended.astype(np.uint8)
+    blended = blended.astype(np.uint8)
+
+    return blended
 
 
 def _array_to_base64_png(arr: np.ndarray) -> str:

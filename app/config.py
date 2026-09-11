@@ -13,11 +13,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHECKPOINTS_DIR = os.path.join(BASE_DIR, "checkpoints")
 
 # JSON exported by the notebook (Section 6 "Saving the final model + deployment config").
-DEPLOYMENT_CONFIG_PATH = os.path.join(CHECKPOINTS_DIR, "deployment_config_robust.json")
+DEPLOYMENT_CONFIG_PATH = os.path.join(CHECKPOINTS_DIR, "deployment_config.json")
 
 # Fallback only -- used if deployment_config_robust.json is missing or its weights_path
 # doesn't resolve to a file actually present in checkpoints/.
-DEFAULT_MODEL_WEIGHTS_PATH = os.path.join(CHECKPOINTS_DIR, "unetpp_resnet34_final_robust.pth")
+DEFAULT_MODEL_WEIGHTS_PATH = os.path.join(CHECKPOINTS_DIR, "unetpp_resnet34_final.pth")
 
 
 class Config:
@@ -25,11 +25,7 @@ class Config:
     NUM_CLASSES = 3  # background, right lung, left lung
     CLASS_NAMES = ["Background", "Right lung", "Left lung"]
 
-    # NOTE: deployment_config_robust.json does NOT currently export norm_mean/norm_std --
-    # these hardcoded values ARE the source of truth for now (copied from the notebook's
-    # Config.NORM_MEAN/NORM_STD printout, cell 55). If the notebook is re-run with a
-    # different train split (e.g. a different random_state or dataset version), these
-    # MUST be updated manually, since nothing will warn you of a mismatch otherwise.
+   
     NORM_MEAN = 0.5706
     NORM_STD = 0.2804
 
